@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct SongsModels: Decodable {
+struct SongsModel: Decodable {
     let results: [Song]
     
 }

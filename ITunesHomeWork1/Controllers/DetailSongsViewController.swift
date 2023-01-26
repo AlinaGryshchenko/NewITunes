@@ -1,37 +1,42 @@
 //
-//  DetailViewController.swift
+//  DetailSongsViewController.swift
 //  ITunesHomeWork1
 //
-//  Created by Алина Лошакова on 22.12.2022.
+//  Created by Алина Лошакова on 25.01.2023.
 //
 
 import UIKit
 
-class DetailViewController: UIViewController {
+class DetailSongsViewController: UIViewController {
 
     @IBOutlet weak var albumLogo: UIImageView!
     @IBOutlet weak var albumNameLabel: UILabel!
     @IBOutlet weak var artistNameLabel: UILabel!
     @IBOutlet weak var dataReliseLabel: UILabel!
     @IBOutlet weak var trackCountLabel: UILabel!
-    @IBOutlet weak var collectionView: UICollectionView!
+    @IBOutlet weak var tableView: UITableView!
     
     var album: Album?
     var songs = [Song]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        collectionView.register(UINib(nibName: "SongsCollectionCell", bundle: nil), forCellWithReuseIdentifier: "SongsCollectionCell")
         
-        collectionView.delegate = self
-        collectionView.dataSource = self
+        setDelegate()
         setModel()
         fetchSong(album: album)
     }
     
+    func setDelegate(){
+        tableView.register(UINib(nibName: "TableViewCell", bundle: nil), forCellReuseIdentifier: "TableViewCell")
+        tableView.backgroundColor = .clear
+        
+        tableView.delegate = self
+        tableView.dataSource = self
+    }
+    
     private func setModel() {
-        guard let album = album else { return }
+     guard let album = album else {return}
         
         albumNameLabel.text = album.collectionName
         artistNameLabel.text = album.artistName
@@ -74,42 +79,43 @@ class DetailViewController: UIViewController {
         }
     }
     
+    
     private func fetchSong(album: Album?) {
-        guard let album = album else {return}
+        guard let album = album else { return }
         
         let idAlbum = album.collectionId
         let urlString = "https://itunes.apple.com/lookup?id=\(idAlbum)&entity=song"
         
         NetworkDataFetch.shared.fetchSongs(urlString: urlString) { [weak self] songModel, error in
             if error == nil {
-                guard let songModel = songModel else {return}
+                guard let songModel = songModel else { return }
                 self?.songs = songModel.results
-                self?.collectionView.reloadData()
+                self?.tableView.reloadData()
+                //self?.collectionView.reloadData()
             }else{
                 print(error!.localizedDescription)
                 self?.alertOk(title: "Error", massage: error!.localizedDescription)
             }
         }
+        
     }
+    
 }
 
-extension DetailViewController: UICollectionViewDelegate, UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+extension DetailSongsViewController: UITableViewDelegate, UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return songs.count
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "SongsCollectionCell", for: indexPath) as! SongsCollectionCell
-        let song = songs[indexPath.item].trackName
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "TableViewCell", for: indexPath) as! TableViewCell
+        let song = songs[indexPath.row].trackName
         cell.songsLabel.text = song
+        cell.backgroundColor = .clear
+
         return cell
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-      
-        CGSize(
-            width: collectionView.frame.width,
-            height: 20)
-    }
+    
     
 }

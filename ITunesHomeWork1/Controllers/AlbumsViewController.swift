@@ -72,7 +72,9 @@ extension AlbumsViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
        let sb = UIStoryboard(name: "Main", bundle: nil)
-        let vc = sb.instantiateViewController(withIdentifier: "DetailViewController") as! DetailViewController
+        let vc = sb.instantiateViewController(withIdentifier: "DetailSongsViewController") as! DetailSongsViewController
+        let album: Album = self.albums[indexPath.row]
+        vc.album = album
         self.navigationController?.pushViewController(vc, animated: true)
     }
 }
